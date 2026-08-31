@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemistry Exam Portal | Dr. A.S. KARTHIK</title>
+    <style>
+        :root {
+            --primary: #0a2342;
+            --secondary: #f0a500;
+            --bg-color: #e8f0f6;
+            --text: #2c3e50;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { 
+            background-color: var(--bg-color); 
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='103.9' viewBox='0 0 60 103.9' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%230a2342' stroke-width='1.5' stroke-opacity='0.08'%3E%3Cpolygon points='30,103.9 0,86.6 0,51.9 30,34.6 60,51.9 60,86.6'/%3E%3Cpolygon points='30,51.9 0,34.6 0,0 30,-17.3 60,0 60,34.6'/%3E%3C/g%3E%3C/svg%3E");
+            color: var(--text); margin: 0; padding: 0; 
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0a2342 0%, #17406d 100%);
+            color: white; padding: 25px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 5px solid var(--secondary); box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            position: relative; overflow: hidden;
+        }
+        .header::before {
+            content: '⌬'; position: absolute; font-size: 150px; color: rgba(255,255,255,0.05);
+            right: 15%; top: -40px; transform: rotate(15deg);
+        }
+        .header::after {
+            content: '⚗️'; position: absolute; font-size: 100px; color: rgba(255,255,255,0.05);
+            left: 5%; top: -10px; transform: rotate(-15deg);
+        }
+        .college-info { text-align: center; flex-grow: 1; z-index: 1; }
+        .college-info h1 { margin: 0; font-size: 26px; color: #fff; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .college-info h2 { margin: 10px 0 5px; font-size: 18px; color: var(--secondary); }
+        .college-info p { margin: 5px 0 0; font-size: 16px; font-weight: bold; color: #d0e1f9; }
+        
+        .emblem {
+            background: linear-gradient(135deg, #ffca28, #f57f17); color: #000;
+            width: 85px; height: 85px; border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; text-align: center; font-weight: 900; font-size: 13px;
+            border: 3px solid white; box-shadow: 0 0 15px rgba(240,165,0,0.6); z-index: 1;
+        }
+
+        .container { 
+            max-width: 1000px; margin: 30px auto; padding: 30px; 
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px);
+            border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .section { display: none; }
+        .active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .login-card { max-width: 420px; margin: 0 auto; background: #fff; padding: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-radius: 12px; border-top: 5px solid var(--primary); }
+        
+        input[type="text"], input[type="password"] { width: 100%; padding: 14px; margin: 10px 0 20px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; transition: 0.3s; }
+        input[type="text"]:focus, input[type="password"]:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 8px rgba(240,165,0,0.3); }
+        
+        button { background-color: var(--primary); color: white; border: none; padding: 14px 20px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.3s; margin-top: 10px; width: 100%; letter-spacing: 0.5px; }
+        button:hover { background-color: #06182e; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .btn-secondary { background-color: var(--secondary); color: #000; }
+        .btn-secondary:hover { background-color: #d69300; }
+        
+        .exam-header { display: flex; justify-content: space-between; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-weight: bold; border-left: 5px solid var(--primary); }
+        .timer { color: #d32f2f; font-size: 18px; }
+        .question-box { font-size: 18px; line-height: 1.6; margin-bottom: 25px; color: #1a252f; }
+        .options-box { display: flex; flex-direction: column; gap: 12px; }
+        .option-label { background: #fff; padding: 16px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; display: flex; align-items: flex-start; gap: 15px; font-size: 17px; transition: 0.2s; }
+        .option-label:hover { border-color: var(--secondary); background: #fffdf5; }
+        input[type="radio"] { transform: scale(1.3); accent-color: var(--primary); margin-top: 5px; }
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
+        .nav-buttons button { width: auto; padding: 12px 30px; }
+        
+        .result-box { margin-bottom: 20px; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .correct-ans { color: #2e7d32; font-weight: bold; }
+        .wrong-ans { color: #c62828; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div></div>
+        <div class="college-info">
+            <h1>ARIGNAR ANNA GOVT ARTS COLLEGE, ATTUR - 636 121</h1>
+            <h2>PG DEPARTMENT OF CHEMISTRY</h2>
+            <h2>Class: B.Sc. Chemistry 3rd Year</h2>
+            <p>Guest Lecturer: Dr. A.S. KARTHIK, M.Sc.,M.Phil.,B.Ed.,Ph.D.</p>
+        </div>
+        <div class="emblem">Karthik<br>Chemistry</div>
+    </header>
+
+    <div class="container">
+        <!-- LOGIN SECTION -->
+        <div id="login-section" class="section active">
+            <div class="login-card">
+                <h2 style="text-align: center; color: var(--primary); margin-top: 0; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <span style="font-size: 24px;">⌬</span> Online Examination
+                </h2>
+                
+                <label><b>Roll Number / Register Number:</b></label>
+                <input type="text" id="rollNo" placeholder="Enter your Roll Number">
+                
+                <label><b>Batch Passcode:</b></label>
+                <input type="password" id="passcode" placeholder="Enter Passcode">
+                
+                <button onclick="startLogin()">Start Exam</button>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-secondary" style="width: auto; padding: 10px 20px;" onclick="switchView('admin-login-section')">Admin Login</button>
+            </div>
+        </div>
+
+        <!-- ADMIN LOGIN SECTION -->
+        <div id="admin-login-section" class="section">
+            <div class="login-card">
+                <h2 style="text-align: center; color: var(--primary); margin-top: 0;">Professor Admin Portal</h2>
+                <label><b>Admin Password:</b></label>
+                <input type="password" id="adminPass" placeholder="Enter Admin Password">
+                
+                <button onclick="verifyAdmin()">Login</button>
+                <button style="background: #e0e0e0; color: #333;" onclick="switchView('login-section')">Back to Home</button>
+            </div>
+        </div>
+
+        <!-- ADMIN DASHBOARD -->
+        <div id="admin-dashboard" class="section">
+            <h2>Welcome Dr. A.S. KARTHIK (Admin Dashboard)</h2>
+            <button onclick="switchView('login-section')" style="float: right; background: #c62828; width: auto;">Logout</button>
+            
+            <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                <h3 style="margin-top: 0;">1. Passcode Details</h3>
+                <p><b>Batch 2:</b> BATCH2</p>
+            </div>
+
+            <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h3 style="margin-top: 0;">2. Reset Student Roll Number</h3>
+                <p>If a student's test was interrupted, enter their roll number to allow them to write again.</p>
+                <input type="text" id="resetRollNo" placeholder="Enter Roll Number" style="width: 300px; display: inline-block; margin-right: 10px;">
+                <button onclick="resetStudent()" style="width: auto; display: inline-block;">Reset Access</button>
+            </div>
+        </div>
+
+        <!-- EXAM SECTION -->
+        <div id="exam-section" class="section">
+            <div class="exam-header">
+                <span id="student-info-display">Roll No: </span>
+                <span id="batch-display">Batch: </span>
+                <span class="timer">Time Left: <span id="time">40:00</span></span>
+            </div>
+            
+            <div class="question-box" id="question-text"></div>
+            <div class="options-box" id="options-container"></div>
+            
+            <div class="nav-buttons">
+                <button onclick="prevQuestion()" id="btn-prev">Previous</button>
+                <button class="btn-secondary" onclick="submitExam()" id="btn-submit" style="display:none; width: auto;">Submit Exam</button>
+                <button onclick="nextQuestion()" id="btn-next">Next</button>
+            </div>
+        </div>
+
+        <!-- RESULT SECTION -->
+        <div id="result-section" class="section">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="font-size: 28px; color: var(--primary);">Exam Completed!</h2>
+                <h3 id="score-display" style="font-size: 24px; color: #2e7d32; background: #e8f5e9; padding: 15px; border-radius: 8px; display: inline-block;"></h3>
+                <br>
+                <button onclick="switchView('login-section')" style="width: auto; margin-top: 20px;">Back to Home</button>
+            </div>
+            <div id="review-container"></div>
+        </div>
+    </div>
+
+    <script>
+        const defaultQuestions = [
+            {
+                id: 31, batch: 2,
+                qEN: "Which of the following complexes exhibits a color change upon changing the pH of the solution?[cite: 2]",
+                qTA: "பின்வரும் அணைவுச் சேர்மங்களில் கரைசலின் pH-ஐ மாற்றும்போது நிற மாற்றத்தைக் காட்டுவது எது?[cite: 2]",
+                optEN: ["[CuCl<sub>4</sub>]<sup>2-</sup>", "[Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "[Co(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>"],
+                optTA: ["[CuCl<sub>4</sub>]<sup>2-</sup>", "[Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "[Co(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>"],
+                ans: 1
+            },
+            {
+                id: 32, batch: 2,
+                qEN: "The reaction of a [Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> complex with hydroxide ions leads to the formation of:[cite: 2]",
+                qTA: "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> அணைவு ஹைட்ராக்சைடு அயனிகளுடன் வினைபுரியும்போது உருவாவது:[cite: 2]",
+                optEN: ["Cu(OH)<sub>2</sub>", "[Cu(OH)<sub>4</sub>]<sup>2-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>+</sup>", "Cu<sub>2</sub>(OH)<sub>6</sub>"],
+                optTA: ["Cu(OH)<sub>2</sub>", "[Cu(OH)<sub>4</sub>]<sup>2-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>+</sup>", "Cu<sub>2</sub>(OH)<sub>6</sub>"],
+                ans: 0
+            },
+            {
+                id: 33, batch: 2,
+                qEN: "Which of the following is a characteristic of a chelating ligand?[cite: 2]",
+                qTA: "பின்வருவனவற்றில் இடுக்கிப்பிணைப்பு (chelating) ஈனியின் பண்பு எது?[cite: 2]",
+                optEN: ["It binds to a metal ion through a single coordination site.", "It forms a more stable complex compared to a monodentate ligand.", "It can only coordinate with alkali metal ions.", "It cannot participate in the formation of cyclic structures."],
+                optTA: ["இது உலோக அயனியுடன் ஒரு ஈதல் பிணைப்பு மையத்தின் மூலம் பிணைப்பை ஏற்படுத்துகிறது.", "இது ஒற்றை ஈனியைக் காட்டிலும் அதிக நிலைப்புத்தன்மை கொண்ட அணைவை உருவாக்குகிறது.", "இது கார உலோக அயனிகளுடன் மட்டுமே ஈதல் பிணைப்பை ஏற்படுத்தும்.", "இது வளைய அமைப்புகளை உருவாக்குவதில் பங்கேற்க முடியாது."],
+                ans: 1
+            },
+            {
+                id: 34, batch: 2,
+                qEN: "What is the geometry of [Fe(CO)<sub>5</sub>]?[cite: 2]",
+                qTA: "[Fe(CO)<sub>5</sub>] இன் வடிவம் என்ன?[cite: 2]",
+                optEN: ["Tetrahedral", "Square planar", "Trigonal bipyramidal", "Octahedral"],
+                optTA: ["நான்முகி", "தளசதுரம்", "முக்கோண இருபிரமிடு", "எண்முகி"],
+                ans: 2
+            },
+            {
+                id: 35, batch: 2,
+                qEN: "Which of the following complexes is an example of a non-aqueous coordination compound?[cite: 2]",
+                qTA: "பின்வருவனவற்றில் நீரற்ற அணைவுச் சேர்மத்திற்கு ஒரு எடுத்துக்காட்டு எது?[cite: 2]",
+                optEN: ["[Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[Cr(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[FeCl<sub>4</sub>]<sup>2-</sup>"],
+                optTA: ["[Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[Cr(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[FeCl<sub>4</sub>]<sup>2-</sup>"],
+                ans: 3
+            },
+            {
+                id: 36, batch: 2,
+                qEN: "Which of the following complexes will show optical isomerism?[cite: 2]",
+                qTA: "பின்வரும் அணைவுச் சேர்மங்களில் ஒளி சுழற்சி மாற்றியத்தைக் (optical isomerism) காட்டுவது எது?[cite: 2]",
+                optEN: ["[Ni(CO)<sub>4</sub>]", "[CoCl<sub>4</sub>]<sup>2-</sup>", "[Cr(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup>", "[PtCl<sub>2</sub>(NH<sub>3</sub>)<sub>2</sub>]"],
+                optTA: ["[Ni(CO)<sub>4</sub>]", "[CoCl<sub>4</sub>]<sup>2-</sup>", "[Cr(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup>", "[PtCl<sub>2</sub>(NH<sub>3</sub>)<sub>2</sub>]"],
+                ans: 2
+            },
+            {
+                id: 37, batch: 2,
+                qEN: "In a reaction between [Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> and hydrochloric acid, what happens to the complex?[cite: 2]",
+                qTA: "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> மற்றும் ஹைட்ரோகுளோரிக் அமிலத்திற்கு இடையிலான வினையில் அணைவிற்கு என்ன நிகழ்கிறது?[cite: 2]",
+                optEN: ["The complex remains unchanged.", "The ammonia ligands are replaced by chloride ions.", "The complex is hydrolyzed to form [Cu(OH)<sub>4</sub>]<sup>2-</sup>.", "The complex precipitates as CuCl<sub>2</sub>."],
+                optTA: ["அணைவு மாறாமல் உள்ளது.", "அம்மோனியா ஈனிகள் குளோரைடு அயனிகளால் பதிலீடு செய்யப்படுகின்றன.", "அணைவு நீராற்பகுப்படைந்து [Cu(OH)<sub>4</sub>]<sup>2-</sup> உருவாகிறது.", "அணைவு CuCl<sub>2</sub> ஆக வீழ்படிவாகிறது."],
+                ans: 1
+            },
+            {
+                id: 38, batch: 2,
+                qEN: "Which of the following complexes is diamagnetic?[cite: 2]",
+                qTA: "பின்வரும் அணைவுச் சேர்மங்களில் டயாகாந்தத் தன்மை (diamagnetic) கொண்டது எது?[cite: 2]",
+                optEN: ["[Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup>", "[Mn(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[Ni(CO)<sub>4</sub>]", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>"],
+                optTA: ["[Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup>", "[Mn(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[Ni(CO)<sub>4</sub>]", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>"],
+                ans: 2
+            },
+            {
+                id: 39, batch: 2,
+                qEN: "Which of the following is a characteristic of a bidentate ligand?[cite: 2]",
+                qTA: "பின்வருவனவற்றில் இருமுனை ஈனியின் (bidentate ligand) பண்பு எது?[cite: 2]",
+                optEN: ["It binds to a metal ion through two separate sites.", "It can form a cyclic structure with the metal ion.", "It is always a weak field ligand.", "It only binds to metals in the +1 oxidation state."],
+                optTA: ["இது உலோக அயனியுடன் இரண்டு தனித்தனி பிணைப்பு மையங்களின் மூலம் இணைகிறது.", "இது உலோக அயனியுடன் இணைந்து வளைய அமைப்பை உருவாக்க முடியும்.", "இது எப்போதும் ஒரு மெல்லிய புல ஈனியாகும்.", "இது +1 ஆக்சிஜனேற்ற நிலையில் உள்ள உலோகங்களுடன் மட்டுமே இணைகிறது."],
+                ans: 0
+            },
+            {
+                id: 40, batch: 2,
+                qEN: "Which of the following complexes undergoes a redox reaction when treated with a reducing agent?[cite: 2]",
+                qTA: "பின்வரும் அணைவுச் சேர்மங்களில் ஒடுக்கும் காரணியுடன் வினைபுரியும்போது ஆக்சிஜனேற்ற-ஒடுக்க வினைக்கு (redox reaction) உட்படுவது எது?[cite: 2]",
+                optEN: ["[Cr(OH)<sub>6</sub>]<sup>3-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[Fe(CO)<sub>5</sub>]", "[Co(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>"],
+                optTA: ["[Cr(OH)<sub>6</sub>]<sup>3-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[Fe(CO)<sub>5</sub>]", "[Co(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>"],
+                ans: 3
+            },
+            {
+                id: 41, batch: 2,
+                qEN: "Which of the following complexes will exhibit high spin behavior?[cite: 2]",
+                qTA: "பின்வரும் அணைவுச் சேர்மங்களில் உயர் சுழற்சி (high spin) பண்பைக் காட்டுவது எது?[cite: 2]",
+                optEN: ["[Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[Ni(CO)<sub>4</sub>]", "[CoCl<sub>4</sub>]<sup>2-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>"],
+                optTA: ["[Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[Ni(CO)<sub>4</sub>]", "[CoCl<sub>4</sub>]<sup>2-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>"],
+                ans: 0
+            },
+            {
+                id: 42, batch: 2,
+                qEN: "Which of the following metal ions is most likely to form a square planar complex?[cite: 2]",
+                qTA: "பின்வரும் உலோக அயனிகளில் தளசதுர அணைவை உருவாக்க அதிக வாய்ப்புள்ள அயனி எது?[cite: 2]",
+                optEN: ["Fe<sup>2+</sup>", "Cu<sup>2+</sup>", "Ni<sup>2+</sup>", "Pt<sup>2+</sup>"],
+                optTA: ["Fe<sup>2+</sup>", "Cu<sup>2+</sup>", "Ni<sup>2+</sup>", "Pt<sup>2+</sup>"],
+                ans: 3
+            },
+            {
+                id: 43, batch: 2,
+                qEN: "The reaction of [Fe(CO)<sub>5</sub>] with oxygen results in the formation of:[cite: 2]",
+                qTA: "[Fe(CO)<sub>5</sub>] ஆக்சிஜனுடன் வினைபுரியும்போது உருவாவது:[cite: 2]",
+                optEN: ["[Fe(CO)<sub>4</sub>O]", "Fe<sub>2</sub>(CO)<sub>8</sub>", "Fe<sub>2</sub>O<sub>3</sub>", "Fe(CO)<sub>4</sub>"],
+                optTA: ["[Fe(CO)<sub>4</sub>O]", "Fe<sub>2</sub>(CO)<sub>8</sub>", "Fe<sub>2</sub>O<sub>3</sub>", "Fe(CO)<sub>4</sub>"],
+                ans: 2
+            },
+            {
+                id: 44, batch: 2,
+                qEN: "Which of the following complexes exhibits Jahn-Teller distortion?[cite: 2]",
+                qTA: "பின்வரும் அணைவுச் சேர்மங்களில் ஜான்-டெல்லர் திரிபு (Jahn-Teller distortion) எதில் காணப்படுகிறது?[cite: 2]",
+                optEN: ["[Cu(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "[Mn(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[Fe(CO)<sub>5</sub>]"],
+                optTA: ["[Cu(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "[Mn(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[Fe(CO)<sub>5</sub>]"],
+                ans: 0
+            },
+            {
+                id: 45, batch: 2,
+                qEN: "What type of isomerism is shown by the complex [CoCl<sub>2</sub>(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>?[cite: 2]",
+                qTA: "[CoCl<sub>2</sub>(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> என்ற அணைவுச் சேர்மம் காட்டும் மாற்றியம் எவ்வகையைச் சார்ந்தது?[cite: 2]",
+                optEN: ["Linkage isomerism", "Geometrical isomerism", "Optical isomerism", "Coordination isomerism"],
+                optTA: ["பிணைப்பு மாற்றியம்", "வடிவ மாற்றியம்", "ஒளி சுழற்சி மாற்றியம்", "அணைவு மாற்றியம்"],
+                ans: 1
+            },
+            {
+                id: 46, batch: 2,
+                qEN: "The reaction of [Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> with hydrochloric acid produces:[cite: 2]",
+                qTA: "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> ஹைட்ரோகுளோரிக் அமிலத்துடன் வினைபுரியும்போது உருவாவது:[cite: 2]",
+                optEN: ["[CuCl<sub>4</sub>]<sup>2-</sup>", "[CuCl<sub>6</sub>]<sup>3-</sup>", "CuCl", "Cu<sub>2</sub>Cl<sub>6</sub>"],
+                optTA: ["[CuCl<sub>4</sub>]<sup>2-</sup>", "[CuCl<sub>6</sub>]<sup>3-</sup>", "CuCl", "Cu<sub>2</sub>Cl<sub>6</sub>"],
+                ans: 0
+            },
+            {
+                id: 47, batch: 2,
+                qEN: "Which of the following is a characteristic of a weak field ligand?[cite: 2]",
+                qTA: "பின்வருவனவற்றில் மெல்லிய புல ஈனியின் (weak field ligand) பண்பு எது?[cite: 2]",
+                optEN: ["It induces a large splitting of the d-orbitals.", "It results in a low spin complex.", "It does not cause significant splitting of the d-orbitals.", "It is typically found in octahedral complexes."],
+                optTA: ["இது d-ஆர்பிட்டால்களில் பெரிய பிளவை (splitting) ஏற்படுத்துகிறது.", "இதன் விளைவாக குறைந்த சுழற்சி (low spin) அணைவு உருவாகிறது.", "இது d-ஆர்பிட்டால்களில் குறிப்பிடத்தக்க பிளவை ஏற்படுத்துவதில்லை.", "இது பொதுவாக எண்முகி அணைவுகளில் காணப்படுகிறது."],
+                ans: 2
+            },
+            {
+                id: 48, batch: 2,
+                qEN: "Which of the following is a bidentate ligand?[cite: 2]",
+                qTA: "பின்வருவனவற்றில் இருமுனை ஈனி (bidentate ligand) எது?[cite: 2]",
+                optEN: ["NH<sub>3</sub>", "CO", "EDTA", "Cl<sup>-</sup>"],
+                optTA: ["NH<sub>3</sub>", "CO", "EDTA", "Cl<sup>-</sup>"],
+                ans: 2
+            },
+            {
+                id: 49, batch: 2,
+                qEN: "The complex [Ni(CO)<sub>4</sub>] is:[cite: 2]",
+                qTA: "[Ni(CO)<sub>4</sub>] அணைவு:[cite: 2]",
+                optEN: ["Paramagnetic", "Diamagnetic", "High spin", "Low spin"],
+                optTA: ["பாராகாந்தத் தன்மை", "டயாகாந்தத் தன்மை", "உயர் சுழற்சி", "குறைந்த சுழற்சி"],
+                ans: 1
+            },
+            {
+                id: 50, batch: 2,
+                qEN: "Which of the following is an example of a homonuclear diatomic complex?[cite: 2]",
+                qTA: "பின்வருவனவற்றில் ஒத்த அணுக்கரு ஈரணு அணைவுச் சேர்மத்திற்கு (homonuclear diatomic complex) ஒரு எடுத்துக்காட்டு எது?[cite: 2]",
+                optEN: ["[Fe(CO)<sub>4</sub>]", "[CuCl<sub>2</sub>]<sup>2-</sup>", "[Cr<sub>2</sub>(CO)<sub>10</sub>]", "[Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>"],
+                optTA: ["[Fe(CO)<sub>4</sub>]", "[CuCl<sub>2</sub>]<sup>2-</sup>", "[Cr<sub>2</sub>(CO)<sub>10</sub>]", "[Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>"],
+                ans: 2
+            },
+            {
+                id: 51, batch: 2,
+                qEN: "Which of the following complexes exhibits a square planar geometry?[cite: 2]",
+                qTA: "பின்வரும் அணைவுச் சேர்மங்களில் தளசதுர (square planar) அமைப்பைக் கொண்டிருப்பது எது?[cite: 2]",
+                optEN: ["[Cu(H<sub>2</sub>O)<sub>4</sub>]<sup>2+</sup>", "[Ni(CO)<sub>4</sub>]", "[PdCl<sub>4</sub>]<sup>2-</sup>", "[Co(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>"],
+                optTA: ["[Cu(H<sub>2</sub>O)<sub>4</sub>]<sup>2+</sup>", "[Ni(CO)<sub>4</sub>]", "[PdCl<sub>4</sub>]<sup>2-</sup>", "[Co(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>"],
+                ans: 2
+            },
+            {
+                id: 52, batch: 2,
+                qEN: "In which of the following cases would a metal ion exhibit low spin behavior?[cite: 2]",
+                qTA: "பின்வரும் எந்த நிகழ்வில் உலோக அயனி குறைந்த சுழற்சி (low spin) பண்பைக் காட்டும்?[cite: 2]",
+                optEN: ["When it is coordinated with a strong field ligand.", "When it is coordinated with a weak field ligand.", "When it is in the +3 oxidation state.", "When it is in the +2 oxidation state."],
+                optTA: ["வலிமையான புல ஈனியுடன் ஈதல் பிணைப்பில் இருக்கும்போது.", "மெல்லிய புல ஈனியுடன் ஈதல் பிணைப்பில் இருக்கும்போது.", "+3 ஆக்சிஜனேற்ற நிலையில் இருக்கும்போது.", "+2 ஆக்சிஜனேற்ற நிலையில் இருக்கும்போது."],
+                ans: 0
+            },
+            {
+                id: 53, batch: 2,
+                qEN: "The complex [Fe(CO)<sub>5</sub>] is an example of which type of bonding?[cite: 2]",
+                qTA: "[Fe(CO)<sub>5</sub>] அணைவு எந்த வகையான பிணைப்புக்கு ஒரு எடுத்துக்காட்டு?[cite: 2]",
+                optEN: ["Coordinate covalent bonding", "Ionic bonding", "Covalent bonding", "Metal-metal bonding"],
+                optTA: ["ஈதல் சகப்பிணைப்பு", "அயனிப்பிணைப்பு", "சகப்பிணைப்பு", "உலோக-உலோக பிணைப்பு"],
+                ans: 0
+            },
+            {
+                id: 54, batch: 2,
+                qEN: "Which of the following complexes is most likely to show ligand exchange reactions?[cite: 2]",
+                qTA: "பின்வரும் அணைவுச் சேர்மங்களில் ஈனி பரிமாற்ற வினைகளைக் (ligand exchange reactions) காட்ட அதிக வாய்ப்புள்ளது எது?[cite: 2]",
+                optEN: ["[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[Fe(CO)<sub>5</sub>]", "[NiCl<sub>4</sub>]<sup>2-</sup>", "[PtCl<sub>2</sub>(NH<sub>3</sub>)<sub>2</sub>]"],
+                optTA: ["[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[Fe(CO)<sub>5</sub>]", "[NiCl<sub>4</sub>]<sup>2-</sup>", "[PtCl<sub>2</sub>(NH<sub>3</sub>)<sub>2</sub>]"],
+                ans: 0
+            },
+            {
+                id: 55, batch: 2,
+                qEN: "Which of the following complexes will show cis-trans isomerism?[cite: 2]",
+                qTA: "பின்வரும் அணைவுச் சேர்மங்களில் சிஸ்-டிரான்ஸ் (cis-trans) மாற்றியத்தைக் காட்டுவது எது?[cite: 2]",
+                optEN: ["[NiCl<sub>2</sub>(CO)<sub>2</sub>]", "[CoCl<sub>4</sub>]<sup>2-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[Ni(CO)<sub>4</sub>]"],
+                optTA: ["[NiCl<sub>2</sub>(CO)<sub>2</sub>]", "[CoCl<sub>4</sub>]<sup>2-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[Ni(CO)<sub>4</sub>]"],
+                ans: 0
+            },
+            {
+                id: 56, batch: 2,
+                qEN: "The reaction of [CuCl<sub>4</sub>]<sup>2-</sup> with a strong acid leads to the formation of:[cite: 2]",
+                qTA: "[CuCl<sub>4</sub>]<sup>2-</sup> ஒரு வலிமையான அமிலத்துடன் வினைபுரியும்போது உருவாவது:[cite: 2]",
+                optEN: ["[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[CuCl<sub>6</sub>]<sup>3-</sup>", "[CuCl<sub>2</sub>]<sup>+</sup>", "[CuCl]<sup>2+</sup>"],
+                optTA: ["[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[CuCl<sub>6</sub>]<sup>3-</sup>", "[CuCl<sub>2</sub>]<sup>+</sup>", "[CuCl]<sup>2+</sup>"],
+                ans: 2
+            },
+            {
+                id: 57, batch: 2,
+                qEN: "Which of the following complexes will likely exhibit a high-spin state?[cite: 2]",
+                qTA: "பின்வரும் அணைவுச் சேர்மங்களில் உயர் சுழற்சி நிலையை (high-spin state) காட்ட வாய்ப்புள்ளது எது?[cite: 2]",
+                optEN: ["[Fe(CO)<sub>5</sub>]", "[MnCl<sub>6</sub>]<sup>4-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[Cr(CO)<sub>6</sub>]"],
+                optTA: ["[Fe(CO)<sub>5</sub>]", "[MnCl<sub>6</sub>]<sup>4-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[Cr(CO)<sub>6</sub>]"],
+                ans: 1
+            },
+            {
+                id: 58, batch: 2,
+                qEN: "What happens when [Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup> is treated with an excess of chloride ions?[cite: 2]",
+                qTA: "[Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup> அதிகப்படியான குளோரைடு அயனிகளுடன் வினைபுரியும்போது என்ன நிகழ்கிறது?[cite: 2]",
+                optEN: ["No reaction occurs.", "[NiCl<sub>4</sub>]<sup>2-</sup> is formed.", "[NiCl<sub>2</sub>]<sup>2-</sup> is formed.", "[Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup> is formed."],
+                optTA: ["எந்த வினையும் நிகழாது.", "[NiCl<sub>4</sub>]<sup>2-</sup> உருவாகிறது.", "[NiCl<sub>2</sub>]<sup>2-</sup> உருவாகிறது.", "[Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup> உருவாகிறது."],
+                ans: 1
+            },
+            {
+                id: 59, batch: 2,
+                qEN: "Which of the following complexes is most likely to be paramagnetic?[cite: 2]",
+                qTA: "பின்வரும் அணைவுச் சேர்மங்களில் பாராகாந்தத் தன்மை (paramagnetic) கொண்டிருக்க அதிக வாய்ப்புள்ளது எது?[cite: 2]",
+                optEN: ["[Co(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>", "[CuCl<sub>4</sub>]<sup>2-</sup>", "[Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup>", "[Ni(CO)<sub>4</sub>]"],
+                optTA: ["[Co(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>", "[CuCl<sub>4</sub>]<sup>2-</sup>", "[Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup>", "[Ni(CO)<sub>4</sub>]"],
+                ans: 2
+            },
+            {
+                id: 60, batch: 2,
+                qEN: "The reaction between [CoCl<sub>4</sub>]<sup>2-</sup> and water results in the formation of:[cite: 2]",
+                qTA: "[CoCl<sub>4</sub>]<sup>2-</sup> மற்றும் நீருக்கு இடையிலான வினையில் உருவாவது:[cite: 2]",
+                optEN: ["[Co(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[CoCl<sub>4</sub>]<sup>2-</sup> remains unchanged.", "[Co(H<sub>2</sub>O)<sub>4</sub>]<sup>2-</sup>", "CoCl<sub>2</sub>"],
+                optTA: ["[Co(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[CoCl<sub>4</sub>]<sup>2-</sup> மாறாமல் உள்ளது.", "[Co(H<sub>2</sub>O)<sub>4</sub>]<sup>2-</sup>", "CoCl<sub>2</sub>"],
+                ans: 0
+            }
+        ];
+
+        const passcodes = { "BATCH2": 2 };
+        const ADMIN_PASS = "Karthik@123";
+        let currentBatch = 0, currentQIndex = 0, selectedAnswers = {};
+        let timerInterval, studentRollNo = "";
+        let examQuestions = [];
+
+        function switchView(viewId) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            if(timerInterval) clearInterval(timerInterval);
+        }
+
+        function startLogin() {
+            let roll = document.getElementById('rollNo').value.trim().toUpperCase();
+            let pass = document.getElementById('passcode').value.trim().toUpperCase();
+            if (!roll || !pass) return alert("Please enter both Roll Number and Passcode.");
+            if (!passcodes[pass]) return alert("Invalid Passcode!");
+
+            currentBatch = passcodes[pass];
+            studentRollNo = roll;
+
+            let completeKey = `exam_${roll}_batch${currentBatch}_complete`;
+            if(localStorage.getItem(completeKey)) return alert("You have already completed this exam batch.");
+
+            let startTimeKey = `exam_${roll}_batch${currentBatch}_start`;
+            let savedTime = localStorage.getItem(startTimeKey);
+            let now = Date.now();
+            if (savedTime && (now - parseInt(savedTime) > 8 * 60 * 60 * 1000)) return alert("Your 8-hour access window has expired.");
+            if (!savedTime) localStorage.setItem(startTimeKey, now);
+
+            examQuestions = defaultQuestions.filter(q => q.batch === currentBatch);
+            if(examQuestions.length === 0) return alert("No questions found for this batch yet.");
+
+            document.getElementById('student-info-display').innerText = "Roll No: " + roll;
+            document.getElementById('batch-display').innerText = "Batch: " + currentBatch;
+
+            switchView('exam-section');
+            startTimer(40 * 60);
+            currentQIndex = 0; selectedAnswers = {}; renderQuestion();
+        }
+
+        function startTimer(duration) {
+            let timer = duration;
+            document.getElementById('time').innerText = "40:00";
+            timerInterval = setInterval(function () {
+                let minutes = parseInt(timer / 60, 10);
+                let seconds = parseInt(timer % 60, 10);
+                document.getElementById('time').textContent = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+                if (--timer < 0) { clearInterval(timerInterval); alert("Time is up! Auto-submitting exam."); submitExam(); }
+            }, 1000);
+        }
+
+        function renderQuestion() {
+            let q = examQuestions[currentQIndex];
+            
+            document.getElementById('question-text').innerHTML = `
+                <div style="margin-bottom: 12px; font-weight: bold;">Q${currentQIndex + 1}: ${q.qEN}</div>
+                <div style="color: #17406d; font-weight: bold; padding-bottom: 10px; border-bottom: 1px dashed #ccc;">கேள்வி ${currentQIndex + 1}: ${q.qTA}</div>
+            `;
+            
+            document.getElementById('options-container').innerHTML = q.optEN.map((opt, i) => `
+                <label class="option-label">
+                    <input type="radio" name="qopt" value="${i}" ${selectedAnswers[currentQIndex] === i ? "checked" : ""} onchange="selectedAnswers[currentQIndex]=${i}">
+                    <span style="display: flex; flex-direction: column; gap: 4px;">
+                        <span>${opt}</span>
+                        <span style="color: #17406d; font-size: 0.9em;">${q.optTA[i]}</span>
+                    </span>
+                </label>
+            `).join('');
+
+            document.getElementById('btn-prev').disabled = currentQIndex === 0;
+            document.getElementById('btn-next').style.display = currentQIndex === examQuestions.length - 1 ? 'none' : 'block';
+            document.getElementById('btn-submit').style.display = currentQIndex === examQuestions.length - 1 ? 'block' : 'none';
+        }
+
+        function prevQuestion() { if(currentQIndex > 0) { currentQIndex--; renderQuestion(); } }
+        function nextQuestion() { if(currentQIndex < examQuestions.length - 1) { currentQIndex++; renderQuestion(); } }
+
+        function submitExam() {
+            clearInterval(timerInterval);
+            let score = 0, reviewHTML = "";
+
+            examQuestions.forEach((q, idx) => {
+                let userAns = selectedAnswers[idx];
+                let isCorrect = (userAns === q.ans);
+                if(isCorrect) score++;
+
+                reviewHTML += `<div class="result-box">
+                    <p style="font-size: 16px; margin-bottom:5px;"><b>Q${idx+1}:</b> ${q.qEN}</p>
+                    <p style="font-size: 16px; color:#17406d; margin-top:0;"><b>கேள்வி ${idx+1}:</b> ${q.qTA}</p>
+                    
+                    <p style="margin-top:15px;">Your Answer / உங்கள் விடை: <span class="${isCorrect ? 'correct-ans' : 'wrong-ans'}">${userAns !== undefined ? q.optEN[userAns] + " / <span style='color:#17406d'>" + q.optTA[userAns] + "</span>" : 'Not Attempted'}</span></p>
+                    
+                    ${!isCorrect ? `<p>Correct Answer / சரியான விடை: <span class="correct-ans">${q.optEN[q.ans]} / <span style='color:#17406d'>${q.optTA[q.ans]}</span></span></p>` : ''}
+                </div>`;
+            });
+
+            document.getElementById('score-display').innerText = `Your Score: ${score} / ${examQuestions.length}`;
+            document.getElementById('review-container').innerHTML = reviewHTML;
+            localStorage.setItem(`exam_${studentRollNo}_batch${currentBatch}_complete`, "true");
+            switchView('result-section');
+        }
+
+        function verifyAdmin() {
+            if(document.getElementById('adminPass').value === ADMIN_PASS) {
+                document.getElementById('adminPass').value = ""; switchView('admin-dashboard');
+            } else alert("Incorrect Admin Password!");
+        }
+
+        function resetStudent() {
+            let roll = document.getElementById('resetRollNo').value.trim().toUpperCase();
+            if(!roll) return alert("Enter a Roll Number.");
+            localStorage.removeItem(`exam_${roll}_batch2_start`);
+            localStorage.removeItem(`exam_${roll}_batch2_complete`);
+            alert(`Access reset successfully for Roll No: ${roll}`);
+            document.getElementById('resetRollNo').value = "";
+        }
+    </script>
+</body>
+</html>
