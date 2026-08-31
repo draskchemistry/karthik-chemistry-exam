@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemistry Exam Portal | Dr. A.S. KARTHIK</title>
+    <style>
+        :root {
+            --primary: #0a2342;
+            --secondary: #f0a500;
+            --bg-color: #e8f0f6;
+            --text: #2c3e50;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { 
+            background-color: var(--bg-color); 
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='103.9' viewBox='0 0 60 103.9' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%230a2342' stroke-width='1.5' stroke-opacity='0.08'%3E%3Cpolygon points='30,103.9 0,86.6 0,51.9 30,34.6 60,51.9 60,86.6'/%3E%3Cpolygon points='30,51.9 0,34.6 0,0 30,-17.3 60,0 60,34.6'/%3E%3C/g%3E%3C/svg%3E");
+            color: var(--text); margin: 0; padding: 0; 
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0a2342 0%, #17406d 100%);
+            color: white; padding: 25px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 5px solid var(--secondary); box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            position: relative; overflow: hidden;
+        }
+        .header::before {
+            content: '⌬'; position: absolute; font-size: 150px; color: rgba(255,255,255,0.05);
+            right: 15%; top: -40px; transform: rotate(15deg);
+        }
+        .header::after {
+            content: '⚗️'; position: absolute; font-size: 100px; color: rgba(255,255,255,0.05);
+            left: 5%; top: -10px; transform: rotate(-15deg);
+        }
+        .college-info { text-align: center; flex-grow: 1; z-index: 1; }
+        .college-info h1 { margin: 0; font-size: 26px; color: #fff; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .college-info h2 { margin: 10px 0 5px; font-size: 18px; color: var(--secondary); }
+        .college-info p { margin: 5px 0 0; font-size: 16px; font-weight: bold; color: #d0e1f9; }
+        
+        .emblem {
+            background: linear-gradient(135deg, #ffca28, #f57f17); color: #000;
+            width: 85px; height: 85px; border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; text-align: center; font-weight: 900; font-size: 13px;
+            border: 3px solid white; box-shadow: 0 0 15px rgba(240,165,0,0.6); z-index: 1;
+        }
+
+        .container { 
+            max-width: 1000px; margin: 30px auto; padding: 30px; 
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px);
+            border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .section { display: none; }
+        .active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .login-card { max-width: 420px; margin: 0 auto; background: #fff; padding: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-radius: 12px; border-top: 5px solid var(--primary); }
+        
+        input[type="text"], input[type="password"] { width: 100%; padding: 14px; margin: 10px 0 20px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; transition: 0.3s; }
+        input[type="text"]:focus, input[type="password"]:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 8px rgba(240,165,0,0.3); }
+        
+        button { background-color: var(--primary); color: white; border: none; padding: 14px 20px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.3s; margin-top: 10px; width: 100%; letter-spacing: 0.5px; }
+        button:hover { background-color: #06182e; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .btn-secondary { background-color: var(--secondary); color: #000; }
+        .btn-secondary:hover { background-color: #d69300; }
+        
+        .exam-header { display: flex; justify-content: space-between; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-weight: bold; border-left: 5px solid var(--primary); }
+        .timer { color: #d32f2f; font-size: 18px; }
+        .question-box { font-size: 18px; line-height: 1.6; margin-bottom: 25px; color: #1a252f; }
+        .options-box { display: flex; flex-direction: column; gap: 12px; }
+        .option-label { background: #fff; padding: 16px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; display: flex; align-items: flex-start; gap: 15px; font-size: 17px; transition: 0.2s; }
+        .option-label:hover { border-color: var(--secondary); background: #fffdf5; }
+        input[type="radio"] { transform: scale(1.3); accent-color: var(--primary); margin-top: 5px; }
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
+        .nav-buttons button { width: auto; padding: 12px 30px; }
+        
+        .result-box { margin-bottom: 20px; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .correct-ans { color: #2e7d32; font-weight: bold; }
+        .wrong-ans { color: #c62828; font-weight: bold; }
+        .exp { background: #f0f4f8; padding: 15px; border-left: 4px solid var(--primary); margin-top: 15px; font-size: 15px; border-radius: 0 4px 4px 0;}
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div></div>
+        <div class="college-info">
+            <h1>ARIGNAR ANNA GOVT ARTS COLLEGE, ATTUR - 636 121</h1>
+            <h2>PG DEPARTMENT OF CHEMISTRY</h2>
+            <h2>Class: B.Sc. Chemistry 3rd Year</h2>
+            <p>Guest Lecturer: Dr. A.S. KARTHIK, M.Sc.,M.Phil.,B.Ed.,Ph.D.</p>
+        </div>
+        <div class="emblem">Karthik<br>Chemistry</div>
+    </header>
+
+    <div class="container">
+        <!-- LOGIN SECTION -->
+        <div id="login-section" class="section active">
+            <div class="login-card">
+                <h2 style="text-align: center; color: var(--primary); margin-top: 0; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <span style="font-size: 24px;">⌬</span> Online Examination
+                </h2>
+                
+                <label><b>Roll Number / Register Number:</b></label>
+                <input type="text" id="rollNo" placeholder="Enter your Roll Number">
+                
+                <label><b>Batch Passcode:</b></label>
+                <input type="password" id="passcode" placeholder="Enter Passcode">
+                
+                <button onclick="startLogin()">Start Exam</button>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-secondary" style="width: auto; padding: 10px 20px;" onclick="switchView('admin-login-section')">Admin Login</button>
+            </div>
+        </div>
+
+        <!-- ADMIN LOGIN SECTION -->
+        <div id="admin-login-section" class="section">
+            <div class="login-card">
+                <h2 style="text-align: center; color: var(--primary); margin-top: 0;">Professor Admin Portal</h2>
+                <label><b>Admin Password:</b></label>
+                <input type="password" id="adminPass" placeholder="Enter Admin Password">
+                
+                <button onclick="verifyAdmin()">Login</button>
+                <button style="background: #e0e0e0; color: #333;" onclick="switchView('login-section')">Back to Home</button>
+            </div>
+        </div>
+
+        <!-- ADMIN DASHBOARD -->
+        <div id="admin-dashboard" class="section">
+            <h2>Welcome Dr. A.S. KARTHIK (Admin Dashboard)</h2>
+            <button onclick="switchView('login-section')" style="float: right; background: #c62828; width: auto;">Logout</button>
+            
+            <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                <h3 style="margin-top: 0;">1. Passcode Details</h3>
+                <p><b>Batch 1:</b> BSCIIIB1</p>
+            </div>
+
+            <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h3 style="margin-top: 0;">2. Reset Student Roll Number</h3>
+                <p>If a student's test was interrupted, enter their roll number to allow them to write again.</p>
+                <input type="text" id="resetRollNo" placeholder="Enter Roll Number" style="width: 300px; display: inline-block; margin-right: 10px;">
+                <button onclick="resetStudent()" style="width: auto; display: inline-block;">Reset Access</button>
+            </div>
+        </div>
+
+        <!-- EXAM SECTION -->
+        <div id="exam-section" class="section">
+            <div class="exam-header">
+                <span id="student-info-display">Roll No: </span>
+                <span id="batch-display">Batch: </span>
+                <span class="timer">Time Left: <span id="time">40:00</span></span>
+            </div>
+            
+            <div class="question-box" id="question-text"></div>
+            <div class="options-box" id="options-container"></div>
+            
+            <div class="nav-buttons">
+                <button onclick="prevQuestion()" id="btn-prev">Previous</button>
+                <button class="btn-secondary" onclick="submitExam()" id="btn-submit" style="display:none; width: auto;">Submit Exam</button>
+                <button onclick="nextQuestion()" id="btn-next">Next</button>
+            </div>
+        </div>
+
+        <!-- RESULT SECTION -->
+        <div id="result-section" class="section">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="font-size: 28px; color: var(--primary);">Exam Completed!</h2>
+                <h3 id="score-display" style="font-size: 24px; color: #2e7d32; background: #e8f5e9; padding: 15px; border-radius: 8px; display: inline-block;"></h3>
+                <br>
+                <button onclick="switchView('login-section')" style="width: auto; margin-top: 20px;">Back to Home</button>
+            </div>
+            <div id="review-container"></div>
+        </div>
+    </div>
+
+    <script>
+        const defaultQuestions = [
+            {
+                id: 1, batch: 1,
+                qEN: "Which of the following is the most likely product when a tetrahedral complex of Cu<sup>2+</sup> reacts with ammonia?",
+                qTA: "Cu<sup>2+</sup> இன் நான்முகி அணைவு அம்மோனியாவுடன் வினைபுரியும் போது கிடைக்கும் சாத்தியமான விளைபொருள் பின்வருவனவற்றில் எது?",
+                optEN: ["[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[Cu(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>+</sup>", "Cu(NH<sub>3</sub>)<sub>2</sub>"],
+                optTA: ["[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[Cu(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>+</sup>", "Cu(NH<sub>3</sub>)<sub>2</sub>"],
+                ans: 0,
+                expEN: "Cu<sup>2+</sup> commonly forms a 4-coordinate complex with ammonia, typically [Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>.",
+                expTA: "Cu<sup>2+</sup> பொதுவாக அம்மோனியாவுடன் 4-ஒருங்கிணைவு கொண்ட [Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> அணைவை உருவாக்குகிறது."
+            },
+            {
+                id: 2, batch: 1,
+                qEN: "The reaction of potassium ferrocyanide with Fe<sup>3+</sup> results in the formation of which complex?",
+                qTA: "பொட்டாசியம் ஃபெர்ரோசயனைடு Fe<sup>3+</sup> உடன் வினைபுரியும் போது எந்த அணைவு உருவாகிறது?",
+                optEN: ["[Fe(C<sub>6</sub>H<sub>5</sub>O<sub>2</sub>)<sub>6</sub>]<sup>3+</sup>", "[Fe(CN)<sub>6</sub>]<sup>4-</sup>", "[Fe(CN)<sub>6</sub>]<sup>3-</sup>", "[Fe(CN)<sub>5</sub>]<sup>2-</sup>"],
+                optTA: ["[Fe(C<sub>6</sub>H<sub>5</sub>O<sub>2</sub>)<sub>6</sub>]<sup>3+</sup>", "[Fe(CN)<sub>6</sub>]<sup>4-</sup>", "[Fe(CN)<sub>6</sub>]<sup>3-</sup>", "[Fe(CN)<sub>5</sub>]<sup>2-</sup>"],
+                ans: 1,
+                expEN: "Potassium ferrocyanide contains the [Fe(CN)<sub>6</sub>]<sup>4-</sup> complex ion.",
+                expTA: "பொட்டாசியம் ஃபெர்ரோசயனைடு [Fe(CN)<sub>6</sub>]<sup>4-</sup> அணைவு அயனியைக் கொண்டுள்ளது."
+            },
+            {
+                id: 3, batch: 1,
+                qEN: "In the reaction between Co<sup>3+</sup> and chloride ion in a solvent, the equilibrium concentration of the products leads to which of the following complexes?",
+                qTA: "ஒரு கரைப்பானில் Co<sup>3+</sup> மற்றும் குளோரைடு அயனிக்கு இடையிலான வினையில், பின்வரும் எந்த அணைவு சேர்மம் உருவாகிறது?",
+                optEN: ["[CoCl<sub>4</sub>]<sup>2-</sup>", "[CoCl<sub>6</sub>]<sup>3-</sup>", "[CoCl<sub>3</sub>]", "[Co(NH<sub>3</sub>)<sub>5</sub>Cl]<sup>2+</sup>"],
+                optTA: ["[CoCl<sub>4</sub>]<sup>2-</sup>", "[CoCl<sub>6</sub>]<sup>3-</sup>", "[CoCl<sub>3</sub>]", "[Co(NH<sub>3</sub>)<sub>5</sub>Cl]<sup>2+</sup>"],
+                ans: 1,
+                expEN: "Co<sup>3+</sup> typically forms octahedral complexes like [CoCl<sub>6</sub>]<sup>3-</sup>.",
+                expTA: "Co<sup>3+</sup> பொதுவாக [CoCl<sub>6</sub>]<sup>3-</sup> போன்ற எண்முகி அணைவுகளை உருவாக்குகிறது."
+            },
+            {
+                id: 4, batch: 1,
+                qEN: "The complex [CrCl<sub>6</sub>]<sup>3-</sup> can undergo substitution with excess NH<sub>3</sub>. What is the product of this reaction?",
+                qTA: "[CrCl<sub>6</sub>]<sup>3-</sup> அணைவு அதிகப்படியான NH<sub>3</sub> உடன் பதிலீட்டு வினைக்கு உட்படும்போது கிடைக்கும் விளைபொருள் என்ன?",
+                optEN: ["[Cr(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>", "[Cr(NH<sub>3</sub>)<sub>4</sub>Cl<sub>2</sub>]<sup>+</sup>", "[Cr(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "[CrCl<sub>3</sub>(NH<sub>3</sub>)<sub>3</sub>]"],
+                optTA: ["[Cr(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>", "[Cr(NH<sub>3</sub>)<sub>4</sub>Cl<sub>2</sub>]<sup>+</sup>", "[Cr(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "[CrCl<sub>3</sub>(NH<sub>3</sub>)<sub>3</sub>]"],
+                ans: 0,
+                expEN: "Complete substitution of chloride ligands by ammonia yields the hexaamminechromium(III) complex.",
+                expTA: "குளோரைடு ஈனிகள் முழுமையாக அம்மோனியாவால் பதிலீடு செய்யப்படும்போது [Cr(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup> உருவாகிறது."
+            },
+            {
+                id: 5, batch: 1,
+                qEN: "When a nickel(II) chloride complex reacts with potassium cyanide, what is the expected product?",
+                qTA: "நிக்கல்(II) குளோரைடு அணைவு பொட்டாசியம் சயனைடுடன் வினைபுரியும் போது எதிர்பார்க்கப்படும் விளைபொருள் என்ன?",
+                optEN: ["[Ni(CN)<sub>4</sub>]<sup>2-</sup>", "[Ni(CN)<sub>6</sub>]<sup>4-</sup>", "[Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "[NiCl<sub>4</sub>]<sup>2-</sup>"],
+                optTA: ["[Ni(CN)<sub>4</sub>]<sup>2-</sup>", "[Ni(CN)<sub>6</sub>]<sup>4-</sup>", "[Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "[NiCl<sub>4</sub>]<sup>2-</sup>"],
+                ans: 0,
+                expEN: "Ni<sup>2+</sup> with strong field CN<sup>-</sup> ligands forms a stable square planar complex [Ni(CN)<sub>4</sub>]<sup>2-</sup>.",
+                expTA: "Ni<sup>2+</sup> வலிமையான CN<sup>-</sup> ஈனியுடன் [Ni(CN)<sub>4</sub>]<sup>2-</sup> என்ற தளசதுர அணைவை உருவாக்குகிறது."
+            },
+            {
+                id: 6, batch: 1,
+                qEN: "The reaction of silver ion with thiocyanate produces which of the following complexes?",
+                qTA: "வெள்ளி அயனி (Ag<sup>+</sup>) தயோசயனேட்டுடன் வினைபுரிந்து பின்வரும் எந்த அணைவை உருவாக்குகிறது?",
+                optEN: ["[AgSCN]<sup>2+</sup>", "[Ag(SCN)<sub>2</sub>]<sup>+</sup>", "[Ag<sub>2</sub>(SCN)<sub>4</sub>]<sup>2-</sup>", "[Ag(SCN)<sub>3</sub>]<sup>3-</sup>"],
+                optTA: ["[AgSCN]<sup>2+</sup>", "[Ag(SCN)<sub>2</sub>]<sup>+</sup>", "[Ag<sub>2</sub>(SCN)<sub>4</sub>]<sup>2-</sup>", "[Ag(SCN)<sub>3</sub>]<sup>3-</sup>"],
+                ans: 1,
+                expEN: "Silver commonly forms a linear 2-coordinate complex with thiocyanate.",
+                expTA: "வெள்ளி பொதுவாக தயோசயனேட்டுடன் 2-ஒருங்கிணைவு கொண்ட அணைவை உருவாக்குகிறது."
+            },
+            {
+                id: 7, batch: 1,
+                qEN: "Which of the following ligands can form a chelate complex with Cu<sup>2+</sup>?",
+                qTA: "பின்வரும் ஈனிகளில் எது Cu<sup>2+</sup> உடன் இடுக்கிப்பிணைப்பு (chelate) அணைவை உருவாக்கும்?",
+                optEN: ["Cl<sup>-</sup>", "NH<sub>3</sub>", "Ethylenediamine", "Water"],
+                optTA: ["Cl<sup>-</sup>", "NH<sub>3</sub>", "எத்திலீன்டையமீன்", "நீர்"],
+                ans: 2,
+                expEN: "Ethylenediamine is a bidentate ligand capable of forming a chelate ring.",
+                expTA: "எத்திலீன்டையமீன் ஒரு இருமுனை ஈனியாகும், இது கீலேட் வளையத்தை உருவாக்குகிறது."
+            },
+            {
+                id: 8, batch: 1,
+                qEN: "What is the product when [Fe(CO)<sub>5</sub>] undergoes oxidation with oxygen?",
+                qTA: "[Fe(CO)<sub>5</sub>] ஆக்சிஜனுடன் ஆக்சிஜனேற்றம் அடையும் போது கிடைக்கும் விளைபொருள் என்ன?",
+                optEN: ["[Fe(CO)<sub>4</sub>]<sup>+</sup>", "[Fe(CO)<sub>5</sub>(O<sub>2</sub>)]<sup>2-</sup>", "[Fe(CO)<sub>5</sub>]O", "[Fe(CO)<sub>4</sub>O]<sup>2-</sup>"],
+                optTA: ["[Fe(CO)<sub>4</sub>]<sup>+</sup>", "[Fe(CO)<sub>5</sub>(O<sub>2</sub>)]<sup>2-</sup>", "[Fe(CO)<sub>5</sub>]O", "[Fe(CO)<sub>4</sub>O]<sup>2-</sup>"],
+                ans: 3,
+                expEN: "Oxidative ligand substitution can result in modified structures like [Fe(CO)<sub>4</sub>O]<sup>2-</sup>.",
+                expTA: "ஆக்சிஜனேற்ற பதிலீட்டு வினையின் மூலம் [Fe(CO)<sub>4</sub>O]<sup>2-</sup> உருவாகலாம்."
+            },
+            {
+                id: 9, batch: 1,
+                qEN: "What is the product when Cu<sup>2+</sup> reacts with sodium thiosulfate in an aqueous solution?",
+                qTA: "Cu<sup>2+</sup> நீரிய கரைசலில் சோடியம் தயோசல்பேட்டுடன் வினைபுரியும் போது கிடைக்கும் விளைபொருள் என்ன?",
+                optEN: ["[Cu(S<sub>2</sub>O<sub>3</sub>)<sub>2</sub>]<sup>2-</sup>", "[Cu(S<sub>2</sub>O<sub>3</sub>)<sub>4</sub>]<sup>2-</sup>", "[Cu(S<sub>2</sub>O<sub>3</sub>)<sub>2</sub>]<sup>+</sup>", "[CuSO<sub>4</sub>]<sup>2-</sup>"],
+                optTA: ["[Cu(S<sub>2</sub>O<sub>3</sub>)<sub>2</sub>]<sup>2-</sup>", "[Cu(S<sub>2</sub>O<sub>3</sub>)<sub>4</sub>]<sup>2-</sup>", "[Cu(S<sub>2</sub>O<sub>3</sub>)<sub>2</sub>]<sup>+</sup>", "[CuSO<sub>4</sub>]<sup>2-</sup>"],
+                ans: 0,
+                expEN: "Copper forms complex ions with thiosulfate, commonly represented structurally as [Cu(S<sub>2</sub>O<sub>3</sub>)<sub>2</sub>]<sup>2-</sup>.",
+                expTA: "தயோசல்பேட்டுடன் தாமிரம் [Cu(S<sub>2</sub>O<sub>3</sub>)<sub>2</sub>]<sup>2-</sup> அணைவை உருவாக்குகிறது."
+            },
+            {
+                id: 10, batch: 1,
+                qEN: "In the reaction of Cr<sup>3+</sup> with excess hydroxide ion, what is the product?",
+                qTA: "Cr<sup>3+</sup> அதிகப்படியான ஹைட்ராக்சைடு அயனியுடன் வினைபுரியும் போது கிடைக்கும் விளைபொருள் என்ன?",
+                optEN: ["[Cr(OH)<sub>6</sub>]<sup>3-</sup>", "[Cr(OH)<sub>3</sub>]", "[Cr(OH)<sub>4</sub>]<sup>2-</sup>", "[Cr(OH)<sub>3</sub>]<sup>2-</sup>"],
+                optTA: ["[Cr(OH)<sub>6</sub>]<sup>3-</sup>", "[Cr(OH)<sub>3</sub>]", "[Cr(OH)<sub>4</sub>]<sup>2-</sup>", "[Cr(OH)<sub>3</sub>]<sup>2-</sup>"],
+                ans: 0,
+                expEN: "Excess hydroxide ions lead to the formation of the hexahydroxochromate(III) complex.",
+                expTA: "அதிகப்படியான OH<sup>-</sup> அயனிகள் [Cr(OH)<sub>6</sub>]<sup>3-</sup> அணைவை உருவாக்குகின்றன."
+            },
+            {
+                id: 11, batch: 1,
+                qEN: "Which of the following complex ions has a square planar geometry?",
+                qTA: "பின்வருவனவற்றில் எந்த அணைவு அயனி தளசதுர (square planar) அமைப்பைக் கொண்டுள்ளது?",
+                optEN: ["[NiCl<sub>4</sub>]<sup>2-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[PdCl<sub>4</sub>]<sup>2-</sup>", "[Fe(CO)<sub>4</sub>]<sup>2-</sup>"],
+                optTA: ["[NiCl<sub>4</sub>]<sup>2-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "[PdCl<sub>4</sub>]<sup>2-</sup>", "[Fe(CO)<sub>4</sub>]<sup>2-</sup>"],
+                ans: 2,
+                expEN: "Pd<sup>2+</sup> is a 4d<sup>8</sup> metal ion and almost universally forms square planar complexes.",
+                expTA: "Pd<sup>2+</sup> எப்போதும் தளசதுர அணைவுகளை உருவாக்குகிறது."
+            },
+            {
+                id: 12, batch: 1,
+                qEN: "When the complex [Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> reacts with excess hydrochloric acid, what is the expected product?",
+                qTA: "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> அணைவு அதிகப்படியான ஹைட்ரோகுளோரிக் அமிலத்துடன் வினைபுரியும் போது எதிர்பார்க்கப்படும் விளைபொருள் என்ன?",
+                optEN: ["[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> remains unchanged", "CuCl<sub>2</sub>", "CuCl<sub>4</sub><sup>2-</sup>", "Cu<sub>2</sub>Cl<sub>6</sub>"],
+                optTA: ["[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> மாறாது", "CuCl<sub>2</sub>", "CuCl<sub>4</sub><sup>2-</sup>", "Cu<sub>2</sub>Cl<sub>6</sub>"],
+                ans: 2,
+                expEN: "Excess HCl protonates the ammonia and provides high Cl<sup>-</sup> concentration, yielding the [CuCl<sub>4</sub>]<sup>2-</sup> complex.",
+                expTA: "அதிகப்படியான HCl உடன் அம்மோனியா வெளியேறி [CuCl<sub>4</sub>]<sup>2-</sup> அணைவு உருவாகிறது."
+            },
+            {
+                id: 13, batch: 1,
+                qEN: "Which of the following complexes is paramagnetic?",
+                qTA: "பின்வரும் அணைவுகளில் பாராகாந்தத் தன்மை (paramagnetic) கொண்டது எது?",
+                optEN: ["[Fe(CO)<sub>6</sub>]", "[Cr(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup>", "[CuCl<sub>4</sub>]<sup>2-</sup>", "[Ni(CO)<sub>4</sub>]"],
+                optTA: ["[Fe(CO)<sub>6</sub>]", "[Cr(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup>", "[CuCl<sub>4</sub>]<sup>2-</sup>", "[Ni(CO)<sub>4</sub>]"],
+                ans: 1,
+                expEN: "Cr<sup>3+</sup> is a d<sup>3</sup> system and always has 3 unpaired electrons.",
+                expTA: "Cr<sup>3+</sup> d<sup>3</sup> அமைப்பைக் கொண்டுள்ளதால் எப்போதும் 3 தனித்த எலக்ட்ரான்களைக் கொண்டிருக்கும்."
+            },
+            {
+                id: 14, batch: 1,
+                qEN: "In a reaction between [CoCl<sub>4</sub>]<sup>2-</sup> and NH<sub>3</sub>, what happens to the complex?",
+                qTA: "[CoCl<sub>4</sub>]<sup>2-</sup> மற்றும் NH<sub>3</sub> இடையேயான வினையில் அணைவிற்கு என்ன நிகழ்கிறது?",
+                optEN: ["Formation of [Co(NH<sub>3</sub>)<sub>4</sub>Cl<sub>2</sub>]<sup>+</sup>", "Formation of [Co(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "Remains unchanged", "Formation of [Co(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>"],
+                optTA: ["[Co(NH<sub>3</sub>)<sub>4</sub>Cl<sub>2</sub>]<sup>+</sup> உருவாகிறது", "[Co(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup> உருவாகிறது", "மாற்றமில்லை", "[Co(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> உருவாகிறது"],
+                ans: 1,
+                expEN: "Ammonia completely substitutes the chloride ligands in aqueous medium forming hexaamminecobalt(II).",
+                expTA: "அம்மோனியா குளோரைடு ஈனிகளை முழுமையாக பதிலீடு செய்து [Co(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup> ஐ உருவாக்குகிறது."
+            },
+            {
+                id: 15, batch: 1,
+                qEN: "Which of the following compounds forms a square planar complex when reacted with Cu<sup>2+</sup>?",
+                qTA: "பின்வரும் எந்தச் சேர்மம் Cu<sup>2+</sup> உடன் வினைபுரிந்து தளசதுர அணைவை உருவாக்குகிறது?",
+                optEN: ["Acetylacetone", "Ammonia", "Chloride", "Oxalate ion"],
+                optTA: ["அசிட்டைல்அசிட்டோன்", "அம்மோனியா", "குளோரைடு", "ஆக்ஸலேட் அயனி"],
+                ans: 1,
+                expEN: "Ammonia readily forms the deeply colored, roughly square planar [Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> complex.",
+                expTA: "அம்மோனியா தாமிரத்துடன் தளசதுர [Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> அணைவை உருவாக்குகிறது."
+            },
+            {
+                id: 16, batch: 1,
+                qEN: "Which of the following coordination compounds is an example of a linkage isomer?",
+                qTA: "பின்வருவனவற்றில் பிணைப்பு மாற்றியத்திற்கு (linkage isomer) ஒரு எடுத்துக்காட்டு எது?",
+                optEN: ["[Co(NH<sub>3</sub>)<sub>5</sub>Cl<sub>2</sub>]<sup>2+</sup>", "[Co(NH<sub>3</sub>)<sub>5</sub>NO<sub>2</sub>]<sup>2+</sup>", "[Co(CO)<sub>4</sub>Cl<sub>2</sub>]", "[Cu(CN)<sub>4</sub>]<sup>2-</sup>"],
+                optTA: ["[Co(NH<sub>3</sub>)<sub>5</sub>Cl<sub>2</sub>]<sup>2+</sup>", "[Co(NH<sub>3</sub>)<sub>5</sub>NO<sub>2</sub>]<sup>2+</sup>", "[Co(CO)<sub>4</sub>Cl<sub>2</sub>]", "[Cu(CN)<sub>4</sub>]<sup>2-</sup>"],
+                ans: 1,
+                expEN: "The NO<sub>2</sub><sup>-</sup> group is an ambidentate ligand that can bind through Nitrogen (nitro) or Oxygen (nitrito).",
+                expTA: "NO<sub>2</sub><sup>-</sup> நைட்ரஜன் அல்லது ஆக்சிஜன் வழியாக பிணைப்பை ஏற்படுத்தக்கூடிய ஈனியாகும்."
+            },
+            {
+                id: 17, batch: 1,
+                qEN: "In the reaction of [Cr(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup> with chloride ion, what is formed?",
+                qTA: "[Cr(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup> குளோரைடு அயனியுடன் வினைபுரியும் போது உருவாவது என்ன?",
+                optEN: ["[CrCl<sub>6</sub>]<sup>3-</sup>", "[Cr(NH<sub>3</sub>)<sub>5</sub>Cl]<sup>2+</sup>", "[Cr(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "[CrCl<sub>3</sub>]"],
+                optTA: ["[CrCl<sub>6</sub>]<sup>3-</sup>", "[Cr(NH<sub>3</sub>)<sub>5</sub>Cl]<sup>2+</sup>", "[Cr(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "[CrCl<sub>3</sub>]"],
+                ans: 1,
+                expEN: "Substitution of one ammonia by chloride forms the pentaamminechlorido complex.",
+                expTA: "ஒரு அம்மோனியா குளோரைடினால் பதிலீடு செய்யப்பட்டு [Cr(NH<sub>3</sub>)<sub>5</sub>Cl]<sup>2+</sup> உருவாகிறது."
+            },
+            {
+                id: 18, batch: 1,
+                qEN: "What is the shape of the complex [Ni(CO)<sub>4</sub>]?",
+                qTA: "[Ni(CO)<sub>4</sub>] அணைவின் வடிவம் என்ன?",
+                optEN: ["Tetrahedral", "Square planar", "Octahedral", "Linear"],
+                optTA: ["நான்முகி", "தளசதுரம்", "எண்முகி", "நேர்கோட்டு அமைப்பு"],
+                ans: 0,
+                expEN: "Ni(0) has a d<sup>10</sup> configuration which favors a tetrahedral geometry.",
+                expTA: "Ni(0) என்பது d<sup>10</sup> அமைப்பைக் கொண்டுள்ளதால் இது நான்முகி அமைப்பை உருவாக்குகிறது."
+            },
+            {
+                id: 19, batch: 1,
+                qEN: "Which of the following reactions is an example of a ligand substitution reaction?",
+                qTA: "பின்வருவனவற்றில் ஈனி பதிலீட்டு வினைக்கு (ligand substitution reaction) ஒரு எடுத்துக்காட்டு எது?",
+                optEN: ["[Fe(CO)<sub>5</sub>] + O<sub>2</sub> &rarr; [Fe(CO)<sub>4</sub>O]<sup>2-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> + Cl<sup>-</sup> &rarr; [CuCl<sub>4</sub>]<sup>2-</sup>", "[Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup> + H<sub>2</sub>O &rarr; [Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[Cr(OH)<sub>6</sub>]<sup>3-</sup> + H<sub>2</sub>O &rarr; [Cr(OH)<sub>6</sub>]<sup>3-</sup>"],
+                optTA: ["[Fe(CO)<sub>5</sub>] + O<sub>2</sub> &rarr; [Fe(CO)<sub>4</sub>O]<sup>2-</sup>", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> + Cl<sup>-</sup> &rarr; [CuCl<sub>4</sub>]<sup>2-</sup>", "[Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup> + H<sub>2</sub>O &rarr; [Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup>", "[Cr(OH)<sub>6</sub>]<sup>3-</sup> + H<sub>2</sub>O &rarr; [Cr(OH)<sub>6</sub>]<sup>3-</sup>"],
+                ans: 1,
+                expEN: "Ammonia ligands are replaced by chloride ligands.",
+                expTA: "அம்மோனியா ஈனிகளுக்கு பதிலாக குளோரைடு ஈனிகள் பதிலீடு செய்யப்படுகின்றன."
+            },
+            {
+                id: 20, batch: 1,
+                qEN: "The reaction of [MnO<sub>4</sub>]<sup>-</sup> with H<sub>2</sub>O<sub>2</sub> in acidic solution produces which of the following?",
+                qTA: "அமிலக் கரைசலில் [MnO<sub>4</sub>]<sup>-</sup> மற்றும் H<sub>2</sub>O<sub>2</sub> வினையில் உருவாவது எது?",
+                optEN: ["[Mn<sup>2+</sup>]", "[Mn<sup>3+</sup>]", "[MnO<sub>2</sub>]", "[Mn<sup>4+</sup>]"],
+                optTA: ["[Mn<sup>2+</sup>]", "[Mn<sup>3+</sup>]", "[MnO<sub>2</sub>]", "[Mn<sup>4+</sup>]"],
+                ans: 0,
+                expEN: "Permanganate is reduced to Mn<sup>2+</sup> in acidic medium by hydrogen peroxide.",
+                expTA: "அமில ஊடகத்தில் பெர்மாங்கனேட் Mn<sup>2+</sup> ஆக ஒடுக்கமடைகிறது."
+            },
+            {
+                id: 21, batch: 1,
+                qEN: "Which of the following complexes shows cis-trans isomerism?",
+                qTA: "பின்வரும் அணைவுகளில் சிஸ்-டிரான்ஸ் (cis-trans) மாற்றியத்தைக் காட்டுவது எது?",
+                optEN: ["[Ni(CO)<sub>4</sub>]", "[PtCl<sub>2</sub>(NH<sub>3</sub>)<sub>2</sub>]", "[CoCl<sub>6</sub>]<sup>3-</sup>", "[Cu(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>"],
+                optTA: ["[Ni(CO)<sub>4</sub>]", "[PtCl<sub>2</sub>(NH<sub>3</sub>)<sub>2</sub>]", "[CoCl<sub>6</sub>]<sup>3-</sup>", "[Cu(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>"],
+                ans: 1,
+                expEN: "Square planar complexes of the type MA2B2 (like Cisplatin/Transplatin) exhibit cis-trans isomerism.",
+                expTA: "MA2B2 வகை தளசதுர அணைவுகள் சிஸ்-டிரான்ஸ் மாற்றியத்தைக் காட்டுகின்றன."
+            },
+            {
+                id: 22, batch: 1,
+                qEN: "The reaction of [Cr(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup> with sodium hydroxide results in the formation of which of the following complexes?",
+                qTA: "[Cr(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup> சோடியம் ஹைட்ராக்சைடுடன் வினைபுரியும் போது உருவாகும் அணைவு பின்வருவனவற்றில் எது?",
+                optEN: ["[Cr(OH)<sub>6</sub>]<sup>3-</sup>", "[Cr(OH)<sub>4</sub>]<sup>2-</sup>", "[Cr(OH)<sub>3</sub>]", "[Cr(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>"],
+                optTA: ["[Cr(OH)<sub>6</sub>]<sup>3-</sup>", "[Cr(OH)<sub>4</sub>]<sup>2-</sup>", "[Cr(OH)<sub>3</sub>]", "[Cr(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>"],
+                ans: 0,
+                expEN: "With excess NaOH, the completely substituted hexahydroxochromate(III) ion is formed.",
+                expTA: "அதிகப்படியான NaOH உடன் [Cr(OH)<sub>6</sub>]<sup>3-</sup> அணைவு உருவாகிறது."
+            },
+            {
+                id: 23, batch: 1,
+                qEN: "What happens when a silver ion complex [Ag(NH<sub>3</sub>)<sub>2</sub>]<sup>+</sup> reacts with chloride ions?",
+                qTA: "வெள்ளி அயனி அணைவு [Ag(NH<sub>3</sub>)<sub>2</sub>]<sup>+</sup> குளோரைடு அயனிகளுடன் வினைபுரியும் போது என்ன நிகழ்கிறது?",
+                optEN: ["No reaction", "Formation of [AgCl<sub>2</sub>]<sup>+</sup>", "Formation of [AgCl<sub>4</sub>]<sup>2-</sup>", "Formation of AgCl precipitate"],
+                optTA: ["மாற்றமில்லை", "[AgCl<sub>2</sub>]<sup>+</sup> உருவாகிறது", "[AgCl<sub>4</sub>]<sup>2-</sup> உருவாகிறது", "AgCl வீழ்படிவு உருவாகிறது"],
+                ans: 3,
+                expEN: "Addition of Cl<sup>-</sup> to Tollens' reagent shifts equilibrium, yielding highly insoluble AgCl.",
+                expTA: "குளோரைடு சேரும்போது நீரில் கரையாத AgCl வீழ்படிவு உருவாகிறது."
+            },
+            {
+                id: 24, batch: 1,
+                qEN: "Which of the following complexes is an example of a bridging ligand?",
+                qTA: "பின்வருவனவற்றில் பாலம் அமைக்கும் ஈனிக்கு (bridging ligand) எடுத்துக்காட்டு எது?",
+                optEN: ["[Ni(CO)<sub>4</sub>]", "[Cr(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup>", "[Fe<sub>2</sub>(CO)<sub>9</sub>]", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>"],
+                optTA: ["[Ni(CO)<sub>4</sub>]", "[Cr(H<sub>2</sub>O)<sub>6</sub>]<sup>3+</sup>", "[Fe<sub>2</sub>(CO)<sub>9</sub>]", "[Cu(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>"],
+                ans: 2,
+                expEN: "Diiron nonacarbonyl contains three bridging CO ligands between the two iron centers.",
+                expTA: "[Fe<sub>2</sub>(CO)<sub>9</sub>] இல் இரண்டு இரும்பு அணுக்களுக்கு இடையே மூன்று CO ஈனிகள் பாலம் அமைக்கின்றன."
+            },
+            {
+                id: 25, batch: 1,
+                qEN: "Which of the following compounds can form a 6-coordinate complex with Ni<sup>2+</sup>?",
+                qTA: "பின்வருவனவற்றில் Ni<sup>2+</sup> உடன் 6-அணைவு எண்ணைக் கொண்ட (6-coordinate) அணைவை உருவாக்கக்கூடியது எது?",
+                optEN: ["Ammonia", "Water", "Chloride", "Ethylenediamine"],
+                optTA: ["அம்மோனியா", "நீர்", "குளோரைடு", "எத்திலீன்டையமீன்"],
+                ans: 3,
+                expEN: "Ethylenediamine forms very stable 6-coordinate [Ni(en)<sub>3</sub>]<sup>2+</sup> chelate complexes.",
+                expTA: "எத்திலீன்டையமீன் அதிக நிலைப்புத்தன்மை கொண்ட 6-ஒருங்கிணைவு [Ni(en)<sub>3</sub>]<sup>2+</sup> கீலேட் அணைவை உருவாக்குகிறது."
+            },
+            {
+                id: 26, batch: 1,
+                qEN: "When a square planar complex like [NiCl<sub>4</sub>]<sup>2-</sup> reacts with excess NH<sub>3</sub>, what is the expected result?",
+                qTA: "[NiCl<sub>4</sub>]<sup>2-</sup> போன்ற தளசதுர அணைவு அதிகப்படியான NH<sub>3</sub> உடன் வினைபுரியும் போது எதிர்பார்க்கப்படும் முடிவு என்ன?",
+                optEN: ["Formation of [Ni(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>", "Formation of [NiCl<sub>6</sub>]<sup>2-</sup>", "Formation of [Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>", "No reaction"],
+                optTA: ["[Ni(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup> உருவாகிறது", "[NiCl<sub>6</sub>]<sup>2-</sup> உருவாகிறது", "[Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup> உருவாகிறது", "மாற்றமில்லை"],
+                ans: 2,
+                expEN: "With excess ammonia, Ni<sup>2+</sup> typically expands its coordination to form octahedral [Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup>.",
+                expTA: "அதிகப்படியான அம்மோனியாவுடன் Ni<sup>2+</sup> எண்முகி அணைவான [Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup> ஐ உருவாக்குகிறது."
+            },
+            {
+                id: 27, batch: 1,
+                qEN: "Which of the following is true about the ligand CN<sup>-</sup>?",
+                qTA: "CN<sup>-</sup> ஈனி பற்றிய பின்வரும் கூற்றுகளில் எது உண்மையானது?",
+                optEN: ["It is a weak field ligand.", "It can only act as a monodentate ligand.", "It forms a strong field complex with Fe<sup>2+</sup>.", "It is a bidentate ligand."],
+                optTA: ["இது ஒரு மெல்லிய புல ஈனி.", "இது ஒற்றை ஈனியாக மட்டுமே செயல்படும்.", "இது Fe<sup>2+</sup> உடன் வலிமையான புல அணைவை உருவாக்குகிறது.", "இது இருமுனை ஈனி."],
+                ans: 2,
+                expEN: "Cyanide is a strong field ligand, commonly forming low-spin complexes with metals like Fe<sup>2+</sup>.",
+                expTA: "சயனைடு ஒரு வலிமையான புல ஈனியாகும்."
+            },
+            {
+                id: 28, batch: 1,
+                qEN: "What is the geometry of [NiCl<sub>4</sub>]<sup>2-</sup>?",
+                qTA: "[NiCl<sub>4</sub>]<sup>2-</sup> இன் வடிவம் என்ன?",
+                optEN: ["Tetrahedral", "Square planar", "Octahedral", "Linear"],
+                optTA: ["நான்முகி", "தளசதுரம்", "எண்முகி", "நேர்கோட்டு அமைப்பு"],
+                ans: 0,
+                expEN: "Chloride is a weak field ligand, resulting in a high-spin tetrahedral geometry for Ni<sup>2+</sup> (d<sup>8</sup>).",
+                expTA: "குளோரைடு மெல்லிய ஈனி என்பதால் இது நான்முகி அமைப்பை உருவாக்குகிறது."
+            },
+            {
+                id: 29, batch: 1,
+                qEN: "What happens when [CuCl<sub>4</sub>]<sup>2-</sup> reacts with water?",
+                qTA: "[CuCl<sub>4</sub>]<sup>2-</sup> நீருடன் வினைபுரியும் போது என்ன நிகழ்கிறது?",
+                optEN: ["No change", "Formation of [Cu(H<sub>2</sub>O)<sub>4</sub>]<sup>2+</sup>", "Formation of Cu<sub>2</sub>Cl<sub>6</sub>", "Formation of CuCl<sub>2</sub>"],
+                optTA: ["மாற்றமில்லை", "[Cu(H<sub>2</sub>O)<sub>4</sub>]<sup>2+</sup> உருவாகிறது", "Cu<sub>2</sub>Cl<sub>6</sub> உருவாகிறது", "CuCl<sub>2</sub> உருவாகிறது"],
+                ans: 1,
+                expEN: "Water replaces the chloride ligands, forming the blue aquo complex.",
+                expTA: "நீர் குளோரைடு ஈனிகளை பதிலீடு செய்கிறது."
+            },
+            {
+                id: 30, batch: 1,
+                qEN: "What is the product when a cobalt(III) complex [Co(NH<sub>3</sub>)<sub>5</sub>Cl]<sup>2+</sup> reacts with chloride ion?",
+                qTA: "கோபால்ட்(III) அணைவு [Co(NH<sub>3</sub>)<sub>5</sub>Cl]<sup>2+</sup> குளோரைடு அயனியுடன் வினைபுரியும் போது கிடைக்கும் விளைபொருள் என்ன?",
+                optEN: ["[Co(NH<sub>3</sub>)<sub>5</sub>Cl<sub>2</sub>]<sup>+</sup>", "[Co(NH<sub>3</sub>)<sub>5</sub>Cl<sub>3</sub>]<sup>+</sup>", "[Co(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>", "[CoCl<sub>6</sub>]<sup>3-</sup>"],
+                optTA: ["[Co(NH<sub>3</sub>)<sub>5</sub>Cl<sub>2</sub>]<sup>+</sup>", "[Co(NH<sub>3</sub>)<sub>5</sub>Cl<sub>3</sub>]<sup>+</sup>", "[Co(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup>", "[CoCl<sub>6</sub>]<sup>3-</sup>"],
+                ans: 0,
+                expEN: "A likely substitution under specific conditions replaces an ammonia with a chloride.",
+                expTA: "இந்த வினையில் [Co(NH<sub>3</sub>)<sub>5</sub>Cl<sub>2</sub>]<sup>+</sup> உருவாக வாய்ப்புள்ளது."
+            }
+        ];
+
+        const passcodes = { "BSCIIIB1": 1 };
+        const ADMIN_PASS = "Karthik@123";
+        let currentBatch = 0, currentQIndex = 0, selectedAnswers = {};
+        let timerInterval, studentRollNo = "";
+        let examQuestions = [];
+
+        function switchView(viewId) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            if(timerInterval) clearInterval(timerInterval);
+        }
+
+        function startLogin() {
+            let roll = document.getElementById('rollNo').value.trim().toUpperCase();
+            let pass = document.getElementById('passcode').value.trim().toUpperCase();
+            if (!roll || !pass) return alert("Please enter both Roll Number and Passcode.");
+            if (!passcodes[pass]) return alert("Invalid Passcode!");
+
+            currentBatch = passcodes[pass];
+            studentRollNo = roll;
+
+            let completeKey = `exam_${roll}_batch${currentBatch}_complete`;
+            if(localStorage.getItem(completeKey)) return alert("You have already completed this exam batch.");
+
+            let startTimeKey = `exam_${roll}_batch${currentBatch}_start`;
+            let savedTime = localStorage.getItem(startTimeKey);
+            let now = Date.now();
+            if (savedTime && (now - parseInt(savedTime) > 8 * 60 * 60 * 1000)) return alert("Your 8-hour access window has expired.");
+            if (!savedTime) localStorage.setItem(startTimeKey, now);
+
+            examQuestions = defaultQuestions.filter(q => q.batch === currentBatch);
+            if(examQuestions.length === 0) return alert("No questions found for this batch yet.");
+
+            document.getElementById('student-info-display').innerText = "Roll No: " + roll;
+            document.getElementById('batch-display').innerText = "Batch: " + currentBatch;
+
+            switchView('exam-section');
+            startTimer(40 * 60);
+            currentQIndex = 0; selectedAnswers = {}; renderQuestion();
+        }
+
+        function startTimer(duration) {
+            let timer = duration;
+            document.getElementById('time').innerText = "40:00";
+            timerInterval = setInterval(function () {
+                let minutes = parseInt(timer / 60, 10);
+                let seconds = parseInt(timer % 60, 10);
+                document.getElementById('time').textContent = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+                if (--timer < 0) { clearInterval(timerInterval); alert("Time is up! Auto-submitting exam."); submitExam(); }
+            }, 1000);
+        }
+
+        // Modified for simultaneous Bilingual Display
+        function renderQuestion() {
+            let q = examQuestions[currentQIndex];
+            
+            document.getElementById('question-text').innerHTML = `
+                <div style="margin-bottom: 12px; font-weight: bold;">Q${currentQIndex + 1}: ${q.qEN}</div>
+                <div style="color: #17406d; font-weight: bold; padding-bottom: 10px; border-bottom: 1px dashed #ccc;">கேள்வி ${currentQIndex + 1}: ${q.qTA}</div>
+            `;
+            
+            document.getElementById('options-container').innerHTML = q.optEN.map((opt, i) => `
+                <label class="option-label">
+                    <input type="radio" name="qopt" value="${i}" ${selectedAnswers[currentQIndex] === i ? "checked" : ""} onchange="selectedAnswers[currentQIndex]=${i}">
+                    <span style="display: flex; flex-direction: column; gap: 4px;">
+                        <span>${opt}</span>
+                        <span style="color: #17406d; font-size: 0.9em;">${q.optTA[i]}</span>
+                    </span>
+                </label>
+            `).join('');
+
+            document.getElementById('btn-prev').disabled = currentQIndex === 0;
+            document.getElementById('btn-next').style.display = currentQIndex === examQuestions.length - 1 ? 'none' : 'block';
+            document.getElementById('btn-submit').style.display = currentQIndex === examQuestions.length - 1 ? 'block' : 'none';
+        }
+
+        function prevQuestion() { if(currentQIndex > 0) { currentQIndex--; renderQuestion(); } }
+        function nextQuestion() { if(currentQIndex < examQuestions.length - 1) { currentQIndex++; renderQuestion(); } }
+
+        function submitExam() {
+            clearInterval(timerInterval);
+            let score = 0, reviewHTML = "";
+
+            examQuestions.forEach((q, idx) => {
+                let userAns = selectedAnswers[idx];
+                let isCorrect = (userAns === q.ans);
+                if(isCorrect) score++;
+
+                reviewHTML += `<div class="result-box">
+                    <p style="font-size: 16px; margin-bottom:5px;"><b>Q${idx+1}:</b> ${q.qEN}</p>
+                    <p style="font-size: 16px; color:#17406d; margin-top:0;"><b>கேள்வி ${idx+1}:</b> ${q.qTA}</p>
+                    
+                    <p style="margin-top:15px;">Your Answer / உங்கள் விடை: <span class="${isCorrect ? 'correct-ans' : 'wrong-ans'}">${userAns !== undefined ? q.optEN[userAns] + " / <span style='color:#17406d'>" + q.optTA[userAns] + "</span>" : 'Not Attempted'}</span></p>
+                    
+                    ${!isCorrect ? `<p>Correct Answer / சரியான விடை: <span class="correct-ans">${q.optEN[q.ans]} / <span style='color:#17406d'>${q.optTA[q.ans]}</span></span></p>` : ''}
+                    
+                    <div class="exp">
+                        <b>Explanation:</b> ${q.expEN}<br><br>
+                        <b>விளக்கம்:</b> ${q.expTA}
+                    </div>
+                </div>`;
+            });
+
+            document.getElementById('score-display').innerText = `Your Score: ${score} / ${examQuestions.length}`;
+            document.getElementById('review-container').innerHTML = reviewHTML;
+            localStorage.setItem(`exam_${studentRollNo}_batch${currentBatch}_complete`, "true");
+            switchView('result-section');
+        }
+
+        function verifyAdmin() {
+            if(document.getElementById('adminPass').value === ADMIN_PASS) {
+                document.getElementById('adminPass').value = ""; switchView('admin-dashboard');
+            } else alert("Incorrect Admin Password!");
+        }
+
+        function resetStudent() {
+            let roll = document.getElementById('resetRollNo').value.trim().toUpperCase();
+            if(!roll) return alert("Enter a Roll Number.");
+            localStorage.removeItem(`exam_${roll}_batch1_start`);
+            localStorage.removeItem(`exam_${roll}_batch1_complete`);
+            alert(`Access reset successfully for Roll No: ${roll}`);
+            document.getElementById('resetRollNo').value = "";
+        }
+    </script>
+</body>
+</html>
